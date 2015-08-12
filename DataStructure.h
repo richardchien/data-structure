@@ -10,5 +10,6 @@
 #define __DataStructure__
 
 #include "DynamicArray.h"
+#include "LinkedList.h"
 
 #endif
