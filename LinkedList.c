@@ -101,17 +101,73 @@ void SinglyLListTraverse(SinglyLList *pList, void (*pFunc)(const void *)) {
     }
     
     SinglyLListNode *pNode = pList->pHead;
-    printf("---\n");
     while (pNode) {
         pFunc(pNode->pData);
         pNode = pNode->pNext;
     }
-    printf("---\n");
 }
 
-bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const void *), bool ascend);
-bool SinglyLListReverse(SinglyLList *pList);
-int SinglyLListFind(SinglyLList *pList, void *pVal, int (*pCompareFunc)(const void *, const void *));
+bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const void *), bool ascend) {
+    if (!pList) {
+        return false;
+    }
+    
+    if (pList->length < 2) {
+        return true;
+    }
+    
+    // Bubble sort
+    SinglyLListNode *pCurrHead = pList->pHead;
+    bool isInOrder = false;
+    while (pCurrHead->pNext && !isInOrder) {
+        SinglyLListNode *pNode = pCurrHead;
+        isInOrder = true;
+        while (pNode->pNext) {
+            if ((ascend && 0 < pCompareFunc(pNode->pData, pNode->pNext->pData)) ||
+                (!ascend && 0 > pCompareFunc(pNode->pData, pNode->pNext->pData))) {
+                void *pT = pNode->pData;
+                pNode->pData = pNode->pNext->pData;
+                pNode->pNext->pData = pT;
+                isInOrder = false;
+            }
+            pNode = pNode->pNext;
+        }
+        pCurrHead = pCurrHead->pNext;
+    }
+    
+    return true;
+}
+
+bool SinglyLListReverse(SinglyLList *pList) {
+    if (!pList) {
+        return false;
+    }
+    
+    for (int i = 0; i < pList->length / 2; i++) {
+        if (!SinglyLListSwapItems(pList, i, pList->length - 1 - i)) {
+            // Perhaps never happen
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+int SinglyLListFind(SinglyLList *pList, void *pVal, int (*pCompareFunc)(const void *, const void *)) {
+    if (!pList) {
+        return -2;
+    }
+    
+    SinglyLListNode *pNode = pList->pHead;
+    for (int i = 0; pNode; i++) {
+        if (0 == pCompareFunc(pNode->pData, pVal)) {
+            return i;
+        }
+        pNode = pNode->pNext;
+    }
+    
+    return -1;
+}
 
 #pragma mark - Singly Linked List Manipulate Single Item
 
@@ -253,14 +309,16 @@ bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex) {
             pThis->pNext = pList->pHead;
             pList->pHead = pThis;
         } else {
-            SinglyLListNode *pTemp = sllNodeAt(pList, newIndex);
-            sllNodeAt(pList, newIndex - 1)->pNext = pThis;
+            SinglyLListNode *pTempPrev = sllNodeAt(pList, newIndex - 1);
+            SinglyLListNode *pTemp = pTempPrev->pNext;
+            pTempPrev->pNext = pThis;
             pThis->pNext = pTemp;
         }
     } else {
-        SinglyLListNode *pThis = sllNodeAt(pList, oldIndex);
+        SinglyLListNode *pThisPrev = sllNodeAt(pList, oldIndex - 1);
+        SinglyLListNode *pThis = pThisPrev->pNext;
         SinglyLListNode *pTemp = sllNodeAt(pList, newIndex);
-        sllNodeAt(pList, oldIndex - 1)->pNext = pThis->pNext;
+        pThisPrev->pNext = pThis->pNext;
         
         if (newIndex == 0) {
             pThis->pNext = pList->pHead;
@@ -282,8 +340,46 @@ bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex) {
     return true;
 }
 
-bool SinglyLListSwapItems(SinglyLList *pList, int aIndex, int bIndex);
-bool SinglyLListReplaceItemAWithB(SinglyLList *pList, int aIndex, int bIndex);
+bool SinglyLListSwapItems(SinglyLList *pList, int aIndex, int bIndex) {
+    if (!pList) {
+        return false;
+    }
+    
+    if (aIndex < 0 || aIndex >= pList->length || bIndex < 0 || bIndex >= pList->length) {
+        return false;
+    }
+    
+    if (aIndex == bIndex) {
+        return true;
+    }
+    
+    SinglyLListNode *pNodeA = sllNodeAt(pList, aIndex);
+    SinglyLListNode *pNodeB = sllNodeAt(pList, bIndex);
+    void *pDataTemp = pNodeA->pData;
+    pNodeA->pData = pNodeB->pData;
+    pNodeB->pData = pDataTemp;
+    
+    return true;
+}
+
+bool SinglyLListReplaceItemAWithB(SinglyLList *pList, int aIndex, int bIndex) {
+    if (!pList) {
+        return false;
+    }
+    
+    if (aIndex < 0 || aIndex >= pList->length || bIndex < 0 || bIndex >= pList->length) {
+        return false;
+    }
+    
+    if (aIndex == bIndex) {
+        return true;
+    }
+    
+    void *pData = sllNodeAt(pList, bIndex)->pData;
+    SinglyLListSetItem(pList, aIndex, pData);
+    
+    return true;
+}
 
 bool SinglyLListDeleteItem(SinglyLList *pList, int index) {
     if (!pList) {

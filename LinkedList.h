@@ -46,6 +46,7 @@ void SinglyLListClear(SinglyLList *pList);
 void SinglyLListTraverse(SinglyLList *pList, void (*pFunc)(const void *));
 bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const void *), bool ascend);
 bool SinglyLListReverse(SinglyLList *pList);
+// Return -1 if no such item, return -2 if pList == NULL
 int  SinglyLListFind(SinglyLList *pList, void *pVal, int (*pCompareFunc)(const void *, const void *));
 
 #pragma mark - Singly Linked List Manipulate Single Item
@@ -54,6 +55,7 @@ bool SinglyLListGetItem(SinglyLList *pList, int index, void *pOut);
 bool SinglyLListGetHeadItem(SinglyLList *pList, void *pOut);
 bool SinglyLListGetTailItem(SinglyLList *pList, void *pOut);
 bool SinglyLListSetItem(SinglyLList *pList, int index, void *pIn);
+// Accept index range from 0 to pList->length
 bool SinglyLListInsertItem(SinglyLList *pList, int index, void *pIn);
 bool SinglyLListAppendItem(SinglyLList *pList, void *pIn);
 bool SinglyLListPrependItem(SinglyLList *pList, void *pIn);
