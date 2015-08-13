@@ -49,6 +49,7 @@ bool ArrayGetItem(Array *pArr, int index, void *pOut);
 bool ArrayGetFirstItem(Array *pArr, void *pOut);
 bool ArrayGetLastItem(Array *pArr, void *pOut);
 bool ArraySetItem(Array *pArr, int index, void *pIn);
+// Accept index range from 0 to pArr->length
 bool ArrayInsertItem(Array *pArr, int index, void *pIn);
 bool ArrayAppendItem(Array *pArr, void *pIn);
 bool ArrayPrependItem(Array *pArr, void *pIn);

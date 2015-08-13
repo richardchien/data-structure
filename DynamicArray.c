@@ -110,25 +110,23 @@ bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), boo
         return false;
     }
     
+    if (pArr->length < 2) {
+        return true;
+    }
+    
     // Bubble sort
-    for (int i = 0; i < pArr->length - 1; i++) {
+    bool isInOrder = false;
+    for (int i = 0; i < pArr->length - 1 && !isInOrder; i++) {
+        isInOrder = true;
         for (int j = 0; j < pArr->length - 1 - i; j++) {
-            if (ascend) {
-                if (0 < pCompareFunc(itemAt(pArr, j), itemAt(pArr, j + 1))) {
-                    if (!ArraySwapItems(pArr, j, j + 1)) {
-                        // Probably mess up the original order,
-                        // if already swaped some items
-                        return false;
-                    }
+            if ((ascend && 0 < pCompareFunc(itemAt(pArr, j), itemAt(pArr, j + 1))) ||
+                (!ascend && 0 > pCompareFunc(itemAt(pArr, j), itemAt(pArr, j + 1)))) {
+                if (!ArraySwapItems(pArr, j, j + 1)) {
+                    // Probably mess up the original order,
+                    // if already swaped some items
+                    return false;
                 }
-            } else {
-                if (0 > pCompareFunc(itemAt(pArr, j), itemAt(pArr, j + 1))) {
-                    if (!ArraySwapItems(pArr, j, j + 1)) {
-                        // Probably mess up the original order,
-                        // if already swaped some items
-                        return false;
-                    }
-                }
+                isInOrder = false;
             }
         }
     }
@@ -137,6 +135,10 @@ bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), boo
 }
 
 bool ArrayReverse(Array *pArr) {
+    if (!pArr) {
+        return false;
+    }
+    
     for (int i = 0; i < pArr->length / 2; i++) {
         if (!ArraySwapItems(pArr, i, pArr->length - 1 - i)) {
             // Probably mess up the original order,
@@ -152,6 +154,7 @@ int ArrayFind(Array *pArr, void *pVal, int (*pCompareFunc)(const void *, const v
     if (!pArr) {
         return -2;
     }
+    
     for (int i = 0; i < pArr->length; i++) {
         if (0 == pCompareFunc(itemAt(pArr, i), pVal)) {
             return i;
