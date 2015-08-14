@@ -10,7 +10,7 @@
 
 #pragma mark - Inner Function
 
-static void *itemAt(Array *pArr, int index) {
+static void *itemAt(const Array *pArr, int index) {
     return pArr->pData + index * pArr->itemSize;
 }
 
@@ -46,7 +46,7 @@ Array *ArrayInitWithLength(int itemSize, int initLen) {
     return pArr;
 }
 
-Array *ArraySubArray(Array *pArr, int start, int length) {
+Array *ArraySubArray(const Array *pArr, int start, int length) {
     if (!pArr) {
         return NULL;
     }
@@ -67,17 +67,17 @@ Array *ArraySubArray(Array *pArr, int start, int length) {
     return pOut;
 }
 
-Array *ArrayCopyArray(Array *pArr) {
+Array *ArrayCopy(const Array *pArr) {
     return ArraySubArray(pArr, 0, pArr->length);
 }
 
 #pragma mark - Get Properties
 
-int ArrayLength(Array *pArr) {
+int ArrayLength(const Array *pArr) {
     return pArr->length;
 }
 
-int ArrayItemSize(Array *pArr) {
+int ArrayItemSize(const Array *pArr) {
     return pArr->itemSize;
 }
 
@@ -95,7 +95,7 @@ void ArrayDestroy(Array *pArr) {
     free(pArr);
 }
 
-void ArrayTraverse(Array *pArr, void (*pFunc)(const void *)) {
+void ArrayTraverse(Array *pArr, void (*pFunc)(void *)) {
     if (!pArr) {
         return;
     }
@@ -150,7 +150,7 @@ bool ArrayReverse(Array *pArr) {
     return true;
 }
 
-int ArrayFind(Array *pArr, void *pVal, int (*pCompareFunc)(const void *, const void *)) {
+int ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const void *, const void *)) {
     if (!pArr) {
         return -2;
     }
@@ -166,7 +166,7 @@ int ArrayFind(Array *pArr, void *pVal, int (*pCompareFunc)(const void *, const v
 
 #pragma mark - Manipulate Single Item
 
-bool ArrayGetItem(Array *pArr, int index, void *pOut) {
+bool ArrayGetItem(const Array *pArr, int index, void *pOut) {
     if (!pArr) {
         return false;
     }
@@ -180,15 +180,15 @@ bool ArrayGetItem(Array *pArr, int index, void *pOut) {
     return true;
 }
 
-bool ArrayGetFirstItem(Array *pArr, void *pOut) {
+bool ArrayGetFirstItem(const Array *pArr, void *pOut) {
     return ArrayGetItem(pArr, 0, pOut);
 }
 
-bool ArrayGetLastItem(Array *pArr, void *pOut) {
+bool ArrayGetLastItem(const Array *pArr, void *pOut) {
     return ArrayGetItem(pArr, pArr->length - 1, pOut);
 }
 
-bool ArraySetItem(Array *pArr, int index, void *pIn) {
+bool ArraySetItem(Array *pArr, int index, const void *pIn) {
     if (!pArr) {
         return false;
     }
@@ -202,7 +202,7 @@ bool ArraySetItem(Array *pArr, int index, void *pIn) {
     return true;
 }
 
-bool ArrayInsertItem(Array *pArr, int index, void *pIn) {
+bool ArrayInsertItem(Array *pArr, int index, const void *pIn) {
     if (!pArr) {
         return false;
     }
@@ -223,7 +223,7 @@ bool ArrayInsertItem(Array *pArr, int index, void *pIn) {
     return true;
 }
 
-bool ArrayAppendItem(Array *pArr, void *pIn) {
+bool ArrayAppendItem(Array *pArr, const void *pIn) {
     if (!pArr) {
         return false;
     }
@@ -240,7 +240,7 @@ bool ArrayAppendItem(Array *pArr, void *pIn) {
     return true;
 }
 
-bool ArrayPrependItem(Array *pArr, void *pIn) {
+bool ArrayPrependItem(Array *pArr, const void *pIn) {
     return ArrayInsertItem(pArr, 0, pIn);
 }
 

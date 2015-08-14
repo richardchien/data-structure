@@ -24,35 +24,36 @@ typedef struct {
 
 Array *ArrayInit(int itemSize);
 Array *ArrayInitWithLength(int itemSize, int initLen);
-Array *ArraySubArray(Array *pArr, int start, int length);
-Array *ArrayCopyArray(Array *pArr);
+Array *ArraySubArray(const Array *pArr, int start, int length);
+Array *ArrayCopy(const Array *pArr);
+Array *ArrayConcat(const Array *pArrA, const Array *pArrB); //TODO
 
 #pragma mark - Get Properties
 
-int ArrayLength(Array *pArr);
-int ArrayItemSize(Array *pArr);
+int ArrayLength(const Array *pArr);
+int ArrayItemSize(const Array *pArr);
 
 #pragma mark - Manipulate Whole Array
 
 void ArrayDestroy(Array *pArr);
-void ArrayTraverse(Array *pArr, void (*pFunc)(const void *));
+void ArrayTraverse(Array *pArr, void (*pFunc)(void *));
 // Probably mess up the original order if memory is not enough
 bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), bool ascend);
 // Probably mess up the original order if memory is not enough
 bool ArrayReverse(Array *pArr);
 // Return -1 if no such item, return -2 if pArr == NULL
-int  ArrayFind(Array *pArr, void *pVal, int (*pCompareFunc)(const void *, const void *));
+int  ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const void *, const void *));
 
 #pragma mark - Manipulate Single Item
 
-bool ArrayGetItem(Array *pArr, int index, void *pOut);
-bool ArrayGetFirstItem(Array *pArr, void *pOut);
-bool ArrayGetLastItem(Array *pArr, void *pOut);
-bool ArraySetItem(Array *pArr, int index, void *pIn);
+bool ArrayGetItem(const Array *pArr, int index, void *pOut);
+bool ArrayGetFirstItem(const Array *pArr, void *pOut);
+bool ArrayGetLastItem(const Array *pArr, void *pOut);
+bool ArraySetItem(Array *pArr, int index, const void *pIn);
 // Accept index range from 0 to pArr->length
-bool ArrayInsertItem(Array *pArr, int index, void *pIn);
-bool ArrayAppendItem(Array *pArr, void *pIn);
-bool ArrayPrependItem(Array *pArr, void *pIn);
+bool ArrayInsertItem(Array *pArr, int index, const void *pIn);
+bool ArrayAppendItem(Array *pArr, const void *pIn);
+bool ArrayPrependItem(Array *pArr, const void *pIn);
 bool ArrayMoveItem(Array *pArr, int oldIndex, int newIndex);
 bool ArraySwapItems(Array *pArr, int aIndex, int bIndex);
 bool ArrayReplaceItemAWithB(Array *pArr, int aIndex, int bIndex);
