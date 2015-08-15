@@ -58,8 +58,11 @@ bool SinglyLListGetTailItem(const SinglyLList *pList, void *pOut);
 bool SinglyLListSetItem(SinglyLList *pList, int index, const void *pIn);
 // Accept index range from 0 to pList->length
 bool SinglyLListInsertItem(SinglyLList *pList, int index, const void *pIn);
+bool SinglyLListInsertLList(SinglyLList *pList, int index, const SinglyLList *pNewList); //TODO
 bool SinglyLListAppendItem(SinglyLList *pList, const void *pIn);
+bool SinglyLListAppendLList(SinglyLList *pList, int index, const SinglyLList *pNewList); //TODO
 bool SinglyLListPrependItem(SinglyLList *pList, const void *pIn);
+bool SinglyLListPrependLList(SinglyLList *pList, int index, const SinglyLList *pNewList); // TODO
 bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex);
 bool SinglyLListSwapItems(SinglyLList *pList, int aIndex, int bIndex);
 bool SinglyLListReplaceItemAWithB(SinglyLList *pList, int aIndex, int bIndex);
