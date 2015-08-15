@@ -71,6 +71,27 @@ Array *ArrayCopy(const Array *pArr) {
     return ArraySubArray(pArr, 0, pArr->length);
 }
 
+Array *ArrayConcat(const Array *pArrA, const Array *pArrB) {
+    if ((pArrA && !pArrB) || (!pArrA && pArrB)) {
+        Array *pArr = ArrayCopy(pArrA ? pArrA : pArrB);
+        return pArr;
+    } else if (!pArrA && !pArrB) {
+        return NULL;
+    }
+    
+    Array *pArr = ArrayCopy(pArrA);
+    if (!pArr) {
+        return NULL;
+    }
+    
+    if (!ArrayAppendArray(pArr, pArrB)) {
+        ArrayDestroy(pArr);
+        return NULL;
+    }
+    
+    return pArr;
+}
+
 #pragma mark - Get Properties
 
 int ArrayLength(const Array *pArr) {
@@ -223,6 +244,37 @@ bool ArrayInsertItem(Array *pArr, int index, const void *pIn) {
     return true;
 }
 
+bool ArrayInsertArray(Array *pArr, int index, const Array *pNewArr) {
+    if (!pArr || !pNewArr) {
+        return false;
+    }
+    
+    if (index < 0 || index > pArr->length) {
+        return false;
+    }
+    
+    int originLen = pArr->length;
+    
+    if (!ArrayAppendArray(pArr, pNewArr)) {
+        return false;
+    }
+    
+    for (int i = 0; i < pNewArr->length; i++) {
+        if (!ArrayMoveItem(pArr, originLen + i, index + i)) {
+            // Delete the items added before
+            for (int j = 0; j < i; j++) {
+                ArrayDeleteItem(pArr, index);
+            }
+            for (int j = 0; j < pNewArr->length - i; j++) {
+                ArrayDeleteItem(pArr, pArr->length - 1);
+            }
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 bool ArrayAppendItem(Array *pArr, const void *pIn) {
     if (!pArr) {
         return false;
@@ -240,8 +292,32 @@ bool ArrayAppendItem(Array *pArr, const void *pIn) {
     return true;
 }
 
+bool ArrayAppendArray(Array *pArr, const Array *pNewArr) {
+    if (!pArr) {
+        return false;
+    }
+    
+    void *pData = realloc(pArr->pData, (pArr->length + pNewArr->length) * pArr->itemSize);
+    if (!pData) {
+        return false;
+    }
+    
+    pArr->pData = pData;
+    int originLen = pArr->length;
+    pArr->length += pNewArr->length;
+    for (int i = 0; i < pNewArr->length; i++) {
+        ArraySetItem(pArr, originLen + i, itemAt(pNewArr, i));
+    }
+    
+    return true;
+}
+
 bool ArrayPrependItem(Array *pArr, const void *pIn) {
     return ArrayInsertItem(pArr, 0, pIn);
+}
+
+bool ArrayPrependArray(Array *pArr, const Array *pNewArr) {
+    return ArrayInsertArray(pArr, 0, pNewArr);
 }
 
 bool ArrayMoveItem(Array *pArr, int oldIndex, int newIndex) { // TODO
