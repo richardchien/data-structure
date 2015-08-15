@@ -18,7 +18,7 @@ typedef Array String;
 #pragma mark - Make String
 
 String *StringInit();
-String *StringInitWithCString(char *pCStr);
+String *StringInitWithCString(const char *pCStr);
 String *StringSubString(const String *pStr, int start, int length);
 String *StringCopy(const String *pStr);
 String *StringConcat(const String *pStrA, const String *pStrB);
@@ -79,25 +79,25 @@ char StringLastCharacter(const String *pStr);
 #pragma mark ---Replace
 bool StringReplaceCharacter(String *pStr, int index, char ch);
 bool StringReplaceCharacterAWithB(String *pStr, int aIndex, int bIndex);
-bool StringReplaceSubString(String *pStr, int index, String *pNewSub);
-bool StringReplaceSubCString(String *pStr, int index, char *pNewCSub);
+bool StringReplaceSubString(String *pStr, int index, const String *pNewSub);
+bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub);
 bool StringReplaceAllCharater(String *pStr, char oldCh, char newCh);
-bool StringReplaceAllSubString(String *pStr, String *pOldSub, String *pNewSub);
-bool StringReplaceAllSubCString(String *pStr, char *pOldCSub, char *pNewCSub);
+bool StringReplaceAllSubString(String *pStr, const String *pOldSub, const String *pNewSub);
+bool StringReplaceAllSubCString(String *pStr, const char *pOldCSub, const char *pNewCSub);
 
 #pragma mark ---Insert
 // Accept index range from 0 to pStr->length
 bool StringInsertCharacter(String *pStr, int index, char ch);
-bool StringInsertString(String *pStr, int index, String *pNewStr);
-bool StringInsertCString(String *pStr, int index, char *pNewCStr);
+bool StringInsertString(String *pStr, int index, const String *pNewStr);
+bool StringInsertCString(String *pStr, int index, const char *pNewCStr);
 
 #pragma mark ---Append & Prepend
 bool StringAppendCharacter(String *pStr, char ch);
-bool StringAppendString(String *pStr, String *pNewStr);
-bool StringAppendCString(String *pStr, char *pNewCStr);
+bool StringAppendString(String *pStr, const String *pNewStr);
+bool StringAppendCString(String *pStr, const char *pNewCStr);
 bool StringPrependCharacter(String *pStr, char ch);
-bool StringPrependString(String *pStr, String *pNewStr);
-bool StringPrependCString(String *pStr, char *pNewCStr);
+bool StringPrependString(String *pStr, const String *pNewStr);
+bool StringPrependCString(String *pStr, const char *pNewCStr);
 
 #pragma mark ---Move & Swap
 bool StringMoveCharacter(String *pStr, int oldIndex, int newIndex);
