@@ -17,10 +17,23 @@ typedef Array String;
 
 #pragma mark - Make String
 
-String *StringInit(int itemSize);
+String *StringInit();
+String *StringInitWithCString(char *pCStr);
 String *StringSubString(const String *pStr, int start, int length);
 String *StringCopy(const String *pStr);
 String *StringConcat(const String *pStrA, const String *pStrB);
+// Accept Array of String
+String *StringJoin(const Array *pStrArr, char separator);
+// Accept Array of C string
+String *StringJoinC(const Array *pCStrArr, char separator);
+// Accept Array of String
+char   *CStringJoin(const Array *pStrArr, char separator);
+// Return Array of String
+Array *StringSplit(const String *pStr, char separator);
+// Return Array of String
+Array *StringSplitC(const char *pCStr, char separator);
+// Return Array of C string
+Array *CStringSplit(const String *pStr, char separator);
 
 char *StringCString(const String *pStr);
 char *StringSubCString(const String *pStr, int start, int length);
@@ -38,6 +51,10 @@ void StringDestroy(String *pStr);
 void StringClear(String *pStr);
 // Probably mess up the original order if memory is not enough
 bool StringReverse(String *pStr);
+
+bool StringTrimCharacter(String *pStr, char ch);
+// Trim blank characters
+bool StringTrim(String *pStr);
 
 #pragma mark ---Do Not Modify
 void StringPrint(const String *pStr);
@@ -89,10 +106,5 @@ bool StringSwapCharacters(String *pStr, int aIndex, int bIndex);
 #pragma mark ---Delete
 bool StringDeleteCharacter(String *pStr, int index);
 bool StringDeleteSubString(String *pStr, int start, int length);
-
-#pragma mark ---Trim
-bool StringTrimCharacter(String *pStr, char ch);
-// Trim blank characters
-bool StringTrim(String *pStr);
 
 #endif
