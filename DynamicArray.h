@@ -36,6 +36,7 @@ int ArrayItemSize(const Array *pArr);
 #pragma mark - Manipulate Whole Array
 
 void ArrayDestroy(Array *pArr);
+void ArrayClear(Array *pArr);
 void ArrayTraverse(Array *pArr, void (*pFunc)(void *));
 // Probably mess up the original order if memory is not enough
 bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), bool ascend);

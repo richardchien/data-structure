@@ -116,6 +116,18 @@ void ArrayDestroy(Array *pArr) {
     free(pArr);
 }
 
+void ArrayClear(Array *pArr) {
+    if (!pArr) {
+        return;
+    }
+    
+    if (pArr->pData) {
+        free(pArr->pData);
+        pArr->pData = NULL;
+    }
+    pArr->length = 0;
+}
+
 void ArrayTraverse(Array *pArr, void (*pFunc)(void *)) {
     if (!pArr) {
         return;
