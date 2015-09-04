@@ -17,6 +17,10 @@ static void *itemAt(const Array *pArr, int index) {
 #pragma mark - Make Array
 
 Array *ArrayInit(int itemSize) {
+    if (itemSize <= 0) {
+        return NULL;
+    }
+    
     Array *pArr = (Array *)malloc(sizeof(Array));
     if (!pArr) {
         return NULL;
@@ -30,6 +34,10 @@ Array *ArrayInit(int itemSize) {
 }
 
 Array *ArrayInitWithLength(int itemSize, int initLen) {
+    if (initLen < 0) {
+        return NULL;
+    }
+    
     Array *pArr = ArrayInit(itemSize);
     if (!pArr) {
         return NULL;
@@ -95,11 +103,11 @@ Array *ArrayConcat(const Array *pArrA, const Array *pArrB) {
 #pragma mark - Get Properties
 
 int ArrayLength(const Array *pArr) {
-    return pArr->length;
+    return pArr ? pArr->length : -1;
 }
 
 int ArrayItemSize(const Array *pArr) {
-    return pArr->itemSize;
+    return pArr ? pArr->itemSize : -1;
 }
 
 #pragma mark - Manipulate Whole Array
@@ -129,7 +137,7 @@ void ArrayClear(Array *pArr) {
 }
 
 void ArrayTraverse(Array *pArr, void (*pFunc)(void *)) {
-    if (!pArr) {
+    if (!pArr || !pFunc) {
         return;
     }
     
@@ -139,7 +147,7 @@ void ArrayTraverse(Array *pArr, void (*pFunc)(void *)) {
 }
 
 bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), bool ascend) {
-    if (!pArr) {
+    if (!pArr || !pCompareFunc) {
         return false;
     }
     
@@ -184,7 +192,7 @@ bool ArrayReverse(Array *pArr) {
 }
 
 int ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const void *, const void *)) {
-    if (!pArr) {
+    if (!pArr || !pVal || !pCompareFunc) {
         return -2;
     }
     
@@ -200,7 +208,7 @@ int ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const voi
 #pragma mark - Manipulate Single Item
 
 bool ArrayGetItem(const Array *pArr, int index, void *pOut) {
-    if (!pArr) {
+    if (!pArr || !pOut) {
         return false;
     }
     
@@ -222,7 +230,7 @@ bool ArrayGetLastItem(const Array *pArr, void *pOut) {
 }
 
 bool ArraySetItem(Array *pArr, int index, const void *pIn) {
-    if (!pArr) {
+    if (!pArr || !pIn) {
         return false;
     }
     
@@ -236,7 +244,7 @@ bool ArraySetItem(Array *pArr, int index, const void *pIn) {
 }
 
 bool ArrayInsertItem(Array *pArr, int index, const void *pIn) {
-    if (!pArr) {
+    if (!pArr || !pIn) {
         return false;
     }
     
@@ -288,7 +296,7 @@ bool ArrayInsertArray(Array *pArr, int index, const Array *pNewArr) {
 }
 
 bool ArrayAppendItem(Array *pArr, const void *pIn) {
-    if (!pArr) {
+    if (!pArr || !pIn) {
         return false;
     }
     
@@ -305,7 +313,7 @@ bool ArrayAppendItem(Array *pArr, const void *pIn) {
 }
 
 bool ArrayAppendArray(Array *pArr, const Array *pNewArr) {
-    if (!pArr) {
+    if (!pArr || !pNewArr) {
         return false;
     }
     
@@ -434,4 +442,12 @@ bool ArrayDeleteItem(Array *pArr, int index) {
     pArr->pData = realloc(pArr->pData, pArr->length * pArr->itemSize);
     
     return true;
+}
+
+bool ArrayDeleteFirstItem(Array *pArr) {
+    return ArrayDeleteItem(pArr, 0);
+}
+
+bool ArrayDeleteLastItem(Array *pArr) {
+    return ArrayDeleteItem(pArr, pArr->length - 1);
 }

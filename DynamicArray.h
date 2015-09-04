@@ -42,7 +42,7 @@ void ArrayTraverse(Array *pArr, void (*pFunc)(void *));
 bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), bool ascend);
 // Probably mess up the original order if memory is not enough
 bool ArrayReverse(Array *pArr);
-// Return -1 if no such item, return -2 if pArr == NULL
+// Return -1 if no such item, return -2 if parameters invalid
 int  ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const void *, const void *));
 
 #pragma mark - Manipulate Single Item
@@ -63,5 +63,7 @@ bool ArrayMoveItem(Array *pArr, int oldIndex, int newIndex);
 bool ArraySwapItems(Array *pArr, int aIndex, int bIndex);
 bool ArrayReplaceItemAWithB(Array *pArr, int aIndex, int bIndex);
 bool ArrayDeleteItem(Array *pArr, int index);
+bool ArrayDeleteFirstItem(Array *pArr);
+bool ArrayDeleteLastItem(Array *pArr);
 
 #endif
