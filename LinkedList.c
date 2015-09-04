@@ -21,6 +21,10 @@ static SinglyLListNode *sllNodeAt(const SinglyLList *pList, int index) {
 #pragma mark - Singly Linked List Make List
 
 SinglyLList *SinglyLListInit(int itemSize) {
+    if (itemSize <= 0) {
+        return NULL;
+    }
+    
     SinglyLList *pList = malloc(sizeof(SinglyLList));
     if (!pList) {
         return NULL;
@@ -67,11 +71,11 @@ SinglyLList *SinglyLListCopy(const SinglyLList *pList) {
 #pragma mark - Singly Linked List Get Properties
 
 int SinglyLListLength(const SinglyLList *pList) {
-    return pList->length;
+    return pList ? pList->length : -1;
 }
 
 int SinglyLListItemSize(const SinglyLList *pList) {
-    return pList->itemSize;
+    return pList ? pList->itemSize : -1;
 }
 
 #pragma mark - Singly Linked List Manipulate Whole List
@@ -96,7 +100,7 @@ void SinglyLListClear(SinglyLList *pList) {
 }
 
 void SinglyLListTraverse(SinglyLList *pList, void (*pFunc)(void *)) {
-    if (!pList) {
+    if (!pList || !pFunc) {
         return;
     }
     
@@ -108,7 +112,7 @@ void SinglyLListTraverse(SinglyLList *pList, void (*pFunc)(void *)) {
 }
 
 bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const void *), bool ascend) {
-    if (!pList) {
+    if (!pList || !pCompareFunc) {
         return false;
     }
     
@@ -154,7 +158,7 @@ bool SinglyLListReverse(SinglyLList *pList) {
 }
 
 int SinglyLListFind(const SinglyLList *pList, const void *pVal, int (*pCompareFunc)(const void *, const void *)) {
-    if (!pList) {
+    if (!pList || !pVal || !pCompareFunc) {
         return -2;
     }
     
@@ -172,7 +176,7 @@ int SinglyLListFind(const SinglyLList *pList, const void *pVal, int (*pCompareFu
 #pragma mark - Singly Linked List Manipulate Single Item
 
 bool SinglyLListGetItem(const SinglyLList *pList, int index, void *pOut) {
-    if (!pList) {
+    if (!pList || !pOut) {
         return false;
     }
     
@@ -186,7 +190,7 @@ bool SinglyLListGetItem(const SinglyLList *pList, int index, void *pOut) {
 }
 
 bool SinglyLListGetHeadItem(const SinglyLList *pList, void *pOut) {
-    if (!pList) {
+    if (!pList || !pOut) {
         return false;
     }
     
@@ -200,7 +204,7 @@ bool SinglyLListGetHeadItem(const SinglyLList *pList, void *pOut) {
 }
 
 bool SinglyLListGetTailItem(const SinglyLList *pList, void *pOut) {
-    if (!pList) {
+    if (!pList || !pOut) {
         return false;
     }
     
@@ -214,7 +218,7 @@ bool SinglyLListGetTailItem(const SinglyLList *pList, void *pOut) {
 }
 
 bool SinglyLListSetItem(SinglyLList *pList, int index, const void *pIn) {
-    if (!pList) {
+    if (!pList || !pIn) {
         return false;
     }
     
@@ -228,7 +232,7 @@ bool SinglyLListSetItem(SinglyLList *pList, int index, const void *pIn) {
 }
 
 bool SinglyLListInsertItem(SinglyLList *pList, int index, const void *pIn) {
-    if (!pList) {
+    if (!pList || !pIn) {
         return false;
     }
     
@@ -413,4 +417,12 @@ bool SinglyLListDeleteItem(SinglyLList *pList, int index) {
     pList->length--;
     
     return true;
+}
+
+bool SinglyLListDeleteHeadItem(SinglyLList *pList) {
+    return SinglyLListDeleteItem(pList, 0);
+}
+
+bool SinglyLListDeleteTailItem(SinglyLList *pList) {
+    return SinglyLListDeleteItem(pList, pList->length - 1);
 }

@@ -47,7 +47,7 @@ void SinglyLListClear(SinglyLList *pList);
 void SinglyLListTraverse(SinglyLList *pList, void (*pFunc)(void *));
 bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const void *), bool ascend);
 bool SinglyLListReverse(SinglyLList *pList);
-// Return -1 if no such item, return -2 if pList == NULL
+// Return -1 if no such item, return -2 if parameters invalid
 int  SinglyLListFind(const SinglyLList *pList, const void *pVal, int (*pCompareFunc)(const void *, const void *));
 
 #pragma mark - Singly Linked List Manipulate Single Item
@@ -67,5 +67,7 @@ bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex);
 bool SinglyLListSwapItems(SinglyLList *pList, int aIndex, int bIndex);
 bool SinglyLListReplaceItemAWithB(SinglyLList *pList, int aIndex, int bIndex);
 bool SinglyLListDeleteItem(SinglyLList *pList, int index);
+bool SinglyLListDeleteHeadItem(SinglyLList *pList);
+bool SinglyLListDeleteTailItem(SinglyLList *pList);
 
 #endif
