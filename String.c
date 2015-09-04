@@ -8,6 +8,12 @@
 
 #include "String.h"
 
+#pragma mark - Inner Function
+
+int compareCh(const void *chA, const void *chB) {
+    return *(const char *)chA - *(const char *)chB;
+}
+
 #pragma mark - Make String
 
 String *StringInit() {
@@ -15,6 +21,10 @@ String *StringInit() {
 }
 
 String *StringInitWithCString(const char *pCStr) {
+    if (!pCStr) {
+        return NULL;
+    }
+    
     String *pStr = StringInit();
     if (!pStr) {
         return NULL;
@@ -29,14 +39,17 @@ String *StringInitWithCString(const char *pCStr) {
 }
 
 String *StringSubString(const String *pStr, int start, int length) {
-    return ArraySubArray((Array *)pStr, start, length);
+    return ArraySubArray(pStr, start, length);
 }
 
 String *StringCopy(const String *pStr) {
-    return ArrayCopy((Array *)pStr);
+    return ArrayCopy(pStr);
 }
 
-String *StringConcat(const String *pStrA, const String *pStrB);
+String *StringConcat(const String *pStrA, const String *pStrB) {
+    return ArrayConcat(pStrA, pStrB);
+}
+
 // Accept Array of String
 String *StringJoin(const Array *pStrArr, char separator);
 // Accept Array of C string
@@ -50,31 +63,149 @@ Array *StringSplitC(const char *pCStr, char separator);
 // Return Array of C string
 Array *CStringSplit(const String *pStr, char separator);
 
-char *StringCString(const String *pStr);
-char *StringSubCString(const String *pStr, int start, int length);
+char *StringCString(const String *pStr) {
+    if (!pStr) {
+        return NULL;
+    }
+    
+    char *pCStr = calloc(pStr->length + 1, sizeof(char));
+    if (!pCStr) {
+        return NULL;
+    }
+    
+    memcpy(pCStr, pStr->pData, pStr->length * pStr->itemSize);
+    pCStr[pStr->length] = '\0';
+    
+    return pCStr;
+}
+
+char *StringSubCString(const String *pStr, int start, int length) {
+    if (!pStr) {
+        return NULL;
+    }
+    
+    if (start < 0 || length < 0 || start + length > pStr->length) {
+        return NULL;
+    }
+    
+    char *pSubCStr = calloc(length + 1, sizeof(char));
+    if (!pSubCStr) {
+        return NULL;
+    }
+    
+    memcpy(pSubCStr, pStr->pData + start, length * pStr->itemSize);
+    pSubCStr[length] = '\0';
+    
+    return pSubCStr;
+}
 
 #pragma mark - Get Properties
 
-int StringLength(const String *pStr);
+int StringLength(const String *pStr) {
+    return pStr ? pStr->length : -1;
+}
 
 #pragma mark - Manipulate Whole String
 
-void StringTraverse(String *pStr, void (*pFunc)(void *));
+void StringTraverse(String *pStr, void (*pFunc)(void *)) {
+    ArrayTraverse(pStr, pFunc);
+}
 
 #pragma mark ---Modify
-void StringDestroy(String *pStr);
-void StringClear(String *pStr);
-// Probably mess up the original order if memory is not enough
-bool StringReverse(String *pStr);
+void StringDestroy(String *pStr) {
+    ArrayDestroy(pStr);
+}
 
-bool StringTrimCharacter(String *pStr, char ch);
+void StringClear(String *pStr) {
+    ArrayClear(pStr);
+}
+
+// Probably mess up the original order if memory is not enough
+bool StringReverse(String *pStr) {
+    return ArrayReverse(pStr);
+}
+
+bool StringTrimCharacter(String *pStr, char ch) {
+    if (!pStr) {
+        return false;
+    }
+    
+    if (ch < 0) {
+        return false;
+    }
+    
+    char item = '\0';
+    
+    bool trimmingLeft = true;
+    for (;;) {
+        if (!pStr->length) {
+            return true;
+        }
+        
+        item = trimmingLeft ? StringFirstCharacter(pStr) : StringLastCharacter(pStr);
+        
+        if (item == ch) {
+            if (!(trimmingLeft ? StringDeleteFirstCharacter(pStr) : StringDeleteLastCharacter(pStr))) {
+                return false;
+            }
+        } else {
+            if (trimmingLeft) {
+                trimmingLeft = false;
+            } else {
+                break;
+            }
+        }
+    }
+    
+    return true;
+}
+
+bool StringTrimCharacters(String *pStr, Array *pChsArr) {
+    if (!pStr || !pChsArr) {
+        return false;
+    }
+    
+    for (int i = 0; i < pChsArr->length; i++) {
+        if (!StringTrimCharacter(pStr, StringCharacter(pChsArr, i))) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 // Trim blank characters
-bool StringTrim(String *pStr);
+bool StringTrim(String *pStr) {
+    if (!pStr) {
+        return false;
+    }
+    
+    Array *pChsArr = ArrayInit(sizeof(char));
+    char chs[6] = {' ', '\t', '\n', '\r', '\0', '\x0B'};
+    for (int i = 0; i < 6; i++) {
+        if (!ArrayAppendItem(pChsArr, &chs[i])) {
+            ArrayDestroy(pChsArr);
+            return false;
+        }
+    }
+    
+    bool result = StringTrimCharacters(pStr, pChsArr);
+    
+    ArrayDestroy(pChsArr);
+    return result;
+}
 
 #pragma mark ---Do Not Modify
-void StringPrint(const String *pStr);
+
+void StringPrint(const String *pStr) {
+    printf("%s\n", StringCString(pStr));
+}
+
 // Return -1 if no such character, return -2 if pStr == NULL
-int  StringFindCharacter(const String *pStr, char ch);
+int  StringFindCharacter(const String *pStr, char ch) {
+    return ArrayFind(pStr, &ch, compareCh);
+}
+
 // Return -1 if no such substring, return -2 if pStr == NULL
 int  StringFindSubString(const String *pStr, const String *pSub);
 // Return -1 if no such substring, return -2 if pStr == NULL
@@ -84,29 +215,115 @@ int  StringCompare(const String *pStrA, const String *pStrB);
 #pragma mark - Manipulate Single Character
 
 #pragma mark ---Get
-bool StringGetCharacter(const String *pStr, int index, char *pOut);
-bool StringGetFirstCharacter(const String *pStr, char *pOut);
-bool StringGetLastCharacter(const String *pStr, char *pOut);
-char StringCharacter(const String *pStr, int index);
-char StringFirstCharacter(const String *pStr);
-char StringLastCharacter(const String *pStr);
+
+bool StringGetCharacter(const String *pStr, int index, char *pOut) {
+    return ArrayGetItem(pStr, index, pOut);
+}
+
+bool StringGetFirstCharacter(const String *pStr, char *pOut) {
+    return ArrayGetFirstItem(pStr, pOut);
+}
+
+bool StringGetLastCharacter(const String *pStr, char *pOut) {
+    return ArrayGetLastItem(pStr, pOut);
+}
+
+char StringCharacter(const String *pStr, int index) {
+    char ch = '\0';
+    StringGetCharacter(pStr, index, &ch);
+    return ch;
+}
+
+char StringFirstCharacter(const String *pStr) {
+    return StringCharacter(pStr, 0);
+}
+
+char StringLastCharacter(const String *pStr) {
+    return StringCharacter(pStr, pStr->length - 1);
+}
 
 #pragma mark ---Replace
-bool StringReplaceCharacter(String *pStr, int index, char ch);
-bool StringReplaceCharacterAWithB(String *pStr, int aIndex, int bIndex);
-bool StringReplaceSubString(String *pStr, int index, const String *pNewSub);
-bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub);
+
+bool StringReplaceCharacter(String *pStr, int index, char ch) {
+    return ArraySetItem(pStr, index, &ch);
+}
+
+bool StringReplaceCharacterAWithB(String *pStr, int aIndex, int bIndex) {
+    return ArrayReplaceItemAWithB(pStr, aIndex, bIndex);
+}
+
+// Perhaps increase the length of the string; Example: replace("I love you",7,"shit") will make "I love shit"
+bool StringReplaceSubString(String *pStr, int index, const String *pNewSub) {
+    if (!pStr || !pNewSub) {
+        return false;
+    }
+    
+    if (index < 0 || index >= pStr->length) {
+        return false;
+    }
+    
+    bool shouldDoAppend = false;
+    for (int i = index, j = 0; j < pNewSub->length; i++, j++) {
+        if (i >= pStr->length) {
+            shouldDoAppend = true;
+        }
+        
+        if (shouldDoAppend) {
+            if (!StringAppendCharacter(pStr, StringCharacter(pNewSub, j))) {
+                return false;
+            }
+        } else {
+            if (!StringReplaceCharacter(pStr, i, StringCharacter(pNewSub, j))) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
+bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub) {
+    if (!pStr || !pNewCSub) {
+        return false;
+    }
+    
+    if (index < 0 || index >= pStr->length) {
+        return false;
+    }
+    
+    bool shouldDoAppend = false;
+    for (int i = index, j = 0; j < strlen(pNewCSub); i++, j++) {
+        if (i >= pStr->length) {
+            shouldDoAppend = true;
+        }
+        
+        if (shouldDoAppend) {
+            if (!StringAppendCharacter(pStr, *(pNewCSub + j))) {
+                return false;
+            }
+        } else {
+            if (!StringReplaceCharacter(pStr, i, *(pNewCSub + j))) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
 bool StringReplaceAllCharater(String *pStr, char oldCh, char newCh);
 bool StringReplaceAllSubString(String *pStr, const String *pOldSub, const String *pNewSub);
 bool StringReplaceAllSubCString(String *pStr, const char *pOldCSub, const char *pNewCSub);
 
 #pragma mark ---Insert
+
 // Accept index range from 0 to pStr->length
 bool StringInsertCharacter(String *pStr, int index, char ch);
 bool StringInsertString(String *pStr, int index, const String *pNewStr);
 bool StringInsertCString(String *pStr, int index, const char *pNewCStr);
 
 #pragma mark ---Append & Prepend
+
 bool StringAppendCharacter(String *pStr, char ch);
 bool StringAppendString(String *pStr, const String *pNewStr);
 bool StringAppendCString(String *pStr, const char *pNewCStr);
@@ -115,9 +332,13 @@ bool StringPrependString(String *pStr, const String *pNewStr);
 bool StringPrependCString(String *pStr, const char *pNewCStr);
 
 #pragma mark ---Move & Swap
+
 bool StringMoveCharacter(String *pStr, int oldIndex, int newIndex);
 bool StringSwapCharacters(String *pStr, int aIndex, int bIndex);
 
 #pragma mark ---Delete
+
 bool StringDeleteCharacter(String *pStr, int index);
+bool StringDeleteFirstCharacter(String *pStr);
+bool StringDeleteLastCharacter(String *pStr);
 bool StringDeleteSubString(String *pStr, int start, int length);
