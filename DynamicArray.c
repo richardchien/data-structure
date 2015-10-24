@@ -11,7 +11,7 @@
 #pragma mark - Inner Function
 
 static void *itemAt(const Array *pArr, int index) {
-    return pArr->pData + index * pArr->itemSize;
+    return (void *)((char *)(pArr->pData) + index * pArr->itemSize);
 }
 
 #pragma mark - Make Array
