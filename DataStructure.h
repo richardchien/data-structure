@@ -11,5 +11,6 @@
 
 #include "DynamicArray.h"
 #include "LinkedList.h"
+#include "String.h"
 
 #endif
