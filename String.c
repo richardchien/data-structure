@@ -10,7 +10,11 @@
 
 #pragma mark - Inner Function
 
-int compareCh(const void *chA, const void *chB) {
+static char *charAt(const Array *pArr, int index) {
+	return (char *)(pArr->pData) + index * pArr->itemSize;
+}
+
+static int compareCh(const void *chA, const void *chB) {
     return *(const char *)chA - *(const char *)chB;
 }
 
@@ -93,7 +97,7 @@ char *StringSubCString(const String *pStr, int start, int length) {
         return NULL;
     }
     
-    memcpy(pSubCStr, pStr->pData + start, length * pStr->itemSize);
+    memcpy(pSubCStr, charAt(pStr, start), length * pStr->itemSize);
     pSubCStr[length] = '\0';
     
     return pSubCStr;
@@ -201,16 +205,100 @@ void StringPrint(const String *pStr) {
     printf("%s\n", StringCString(pStr));
 }
 
-// Return -1 if no such character, return -2 if pStr == NULL
+// Return -1 if no such character, return -2 if parameters invalid
 int  StringFindCharacter(const String *pStr, char ch) {
     return ArrayFind(pStr, &ch, compareCh);
 }
 
-// Return -1 if no such substring, return -2 if pStr == NULL
-int  StringFindSubString(const String *pStr, const String *pSub);
-// Return -1 if no such substring, return -2 if pStr == NULL
-int  StringFindSubCString(const String *pStr, const char *pCSub);
-int  StringCompare(const String *pStrA, const String *pStrB);
+// Return -1 if no such character, return -2 if parameters invalid
+int  StringFindSubString(const String *pStr, const String *pSub) {
+    if (!pStr || !pSub) {
+        return -2;
+    }
+    
+    if (pStr->length < pSub->length) {
+        return -1;
+    }
+    
+    int index = -1;
+    for (int i = 0; i < pStr->length; i++) {
+        if (pStr->length - i < pSub->length) {
+            break;
+        }
+        
+        if (StringCharacter(pStr, i) == StringFirstCharacter(pSub)) {
+            for (int j = 0; j < pSub->length; j++) {
+                if (StringCharacter(pStr, i + j) != StringCharacter(pSub, j)) {
+                    break;
+                }
+                
+                if (j == pSub->length - 1) {
+                    index = i;
+                }
+            }
+        }
+        
+        if (index >= 0) {
+            break; // Found
+        }
+    }
+    
+    return index;
+}
+
+// Return -1 if no such character, return -2 if parameters invalid
+int  StringFindSubCString(const String *pStr, const char *pCSub) {
+    if (!pStr || !pCSub) {
+        return -2;
+    }
+    
+    if (pStr->length < strlen(pCSub)) {
+        return -1;
+    }
+    
+    int index = -1;
+    for (int i = 0; i < pStr->length; i++) {
+        if (pStr->length - i < strlen(pCSub)) {
+            break;
+        }
+        
+        if (StringCharacter(pStr, i) == *pCSub) {
+            for (int j = 0; j < strlen(pCSub); j++) {
+                if (StringCharacter(pStr, i + j) != *(pCSub + j)) {
+                    break;
+                }
+                
+                if (j == strlen(pCSub) - 1) {
+                    index = i;
+                }
+            }
+        }
+        
+        if (index >= 0) {
+            break; // Found
+        }
+    }
+    
+    return index;
+}
+
+// Accept only non-NULL parameters (Return 0 if any parameter is invalid)
+int  StringCompare(const String *pStrA, const String *pStrB) {
+    if (!pStrA || !pStrB) {
+        return 0;
+    }
+    
+    for (int i = 0; i < pStrA->length; i++) {
+        char chA = StringCharacter(pStrA, i);
+        char chB = StringCharacter(pStrB, i);
+        
+        if (chA != chB) {
+            return compareCh(&chA, &chB) > 0 ? 1 : -1;
+        }
+    }
+    
+    return 0;
+}
 
 #pragma mark - Manipulate Single Character
 
@@ -324,12 +412,43 @@ bool StringInsertCString(String *pStr, int index, const char *pNewCStr);
 
 #pragma mark ---Append & Prepend
 
-bool StringAppendCharacter(String *pStr, char ch);
-bool StringAppendString(String *pStr, const String *pNewStr);
-bool StringAppendCString(String *pStr, const char *pNewCStr);
-bool StringPrependCharacter(String *pStr, char ch);
-bool StringPrependString(String *pStr, const String *pNewStr);
-bool StringPrependCString(String *pStr, const char *pNewCStr);
+bool StringAppendCharacter(String *pStr, char ch) {
+    return ArrayAppendItem(pStr, &ch);
+}
+
+bool StringAppendString(String *pStr, const String *pNewStr) {
+    return ArrayAppendArray(pStr, pNewStr);
+}
+
+bool StringAppendCString(String *pStr, const char *pNewCStr) {
+    if (!pStr || !pNewCStr) {
+        return false;
+    }
+    
+    for (int i = 0; *(pNewCStr + i) != '\0'; i++) {
+        if (!StringAppendCharacter(pStr, *(pNewCStr + i))) {
+            // Delete the characters appended before
+            for (int j = 0; j < i; j++) {
+                StringDeleteLastCharacter(pStr);
+            }
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+bool StringPrependCharacter(String *pStr, char ch) {
+    return ArrayPrependItem(pStr, &ch);
+}
+
+bool StringPrependString(String *pStr, const String *pNewStr) {
+    return ArrayPrependArray(pStr, pNewStr);
+}
+
+bool StringPrependCString(String *pStr, const char *pNewCStr) {
+    return true;
+}
 
 #pragma mark ---Move & Swap
 
@@ -338,7 +457,27 @@ bool StringSwapCharacters(String *pStr, int aIndex, int bIndex);
 
 #pragma mark ---Delete
 
-bool StringDeleteCharacter(String *pStr, int index);
-bool StringDeleteFirstCharacter(String *pStr);
-bool StringDeleteLastCharacter(String *pStr);
-bool StringDeleteSubString(String *pStr, int start, int length);
+bool StringDeleteCharacter(String *pStr, int index) {
+    return ArrayDeleteItem(pStr, index);
+}
+bool StringDeleteFirstCharacter(String *pStr) {
+    return ArrayDeleteFirstItem(pStr);
+}
+bool StringDeleteLastCharacter(String *pStr) {
+    return ArrayDeleteLastItem(pStr);
+}
+bool StringDeleteSubString(String *pStr, int start, int length) {
+    if (!pStr) {
+        return false;
+    }
+    
+    if (start < 0 || length < 0 || start + length > pStr->length) {
+        return false;
+    }
+    
+    for (int i = 0; i < length; i++) {
+        StringDeleteCharacter(pStr, start);
+    }
+    
+    return true;
+}

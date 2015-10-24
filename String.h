@@ -65,6 +65,7 @@ int  StringFindCharacter(const String *pStr, char ch);
 int  StringFindSubString(const String *pStr, const String *pSub);
 // Return -1 if no such substring, return -2 if parameters invalid
 int  StringFindSubCString(const String *pStr, const char *pCSub);
+// Accept only non-NULL parameters (Return 0 if any parameter is invalid)
 int  StringCompare(const String *pStrA, const String *pStrB);
 
 #pragma mark - Manipulate Single Character
