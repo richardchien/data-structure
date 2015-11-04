@@ -33,7 +33,7 @@ typedef struct {
 SinglyLList *SinglyLListInit(int itemSize);
 SinglyLList *SinglyLListSubList(const SinglyLList *pList, int start, int length);
 SinglyLList *SinglyLListCopy(const SinglyLList *pList);
-SinglyLList *SinglyLListConcat(const SinglyLList *pListA, const SinglyLList *pListB); //TODO
+SinglyLList *SinglyLListConcat(const SinglyLList *pListA, const SinglyLList *pListB);
 
 #pragma mark - Singly Linked List Get Properties
 
@@ -58,11 +58,12 @@ bool SinglyLListGetTailItem(const SinglyLList *pList, void *pOut);
 bool SinglyLListSetItem(SinglyLList *pList, int index, const void *pIn);
 // Accept index range from 0 to pList->length
 bool SinglyLListInsertItem(SinglyLList *pList, int index, const void *pIn);
-bool SinglyLListInsertLList(SinglyLList *pList, int index, const SinglyLList *pNewList); //TODO
+// Accept index range from 0 to pList->length
+bool SinglyLListInsertLList(SinglyLList *pList, int index, const SinglyLList *pNewList);
 bool SinglyLListAppendItem(SinglyLList *pList, const void *pIn);
-bool SinglyLListAppendLList(SinglyLList *pList, int index, const SinglyLList *pNewList); //TODO
+bool SinglyLListAppendLList(SinglyLList *pList, const SinglyLList *pNewList);
 bool SinglyLListPrependItem(SinglyLList *pList, const void *pIn);
-bool SinglyLListPrependLList(SinglyLList *pList, int index, const SinglyLList *pNewList); // TODO
+bool SinglyLListPrependLList(SinglyLList *pList, const SinglyLList *pNewList);
 bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex);
 bool SinglyLListSwapItems(SinglyLList *pList, int aIndex, int bIndex);
 bool SinglyLListReplaceItemAWithB(SinglyLList *pList, int aIndex, int bIndex);

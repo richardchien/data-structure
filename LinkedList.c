@@ -68,6 +68,24 @@ SinglyLList *SinglyLListCopy(const SinglyLList *pList) {
     return SinglyLListSubList(pList, 0, pList->length);
 }
 
+SinglyLList *SinglyLListConcat(const SinglyLList *pListA, const SinglyLList *pListB) {
+	if (!pListA || !pListB) {
+		return NULL;
+	}
+
+	SinglyLList *pOut = SinglyLListCopy(pListA);
+	if (!pOut) {
+		return NULL;
+	}
+
+	if (!SinglyLListAppendLList(pOut, pListB)) {
+		SinglyLListDestroy(pOut);
+		return NULL;
+	}
+
+	return pOut;
+}
+
 #pragma mark - Singly Linked List Get Properties
 
 int SinglyLListLength(const SinglyLList *pList) {
@@ -124,7 +142,8 @@ bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const
     SinglyLListNode *pCurrHead = pList->pHead;
     bool isInOrder = false;
     while (pCurrHead->pNext && !isInOrder) {
-        SinglyLListNode *pNode = pCurrHead;
+        //SinglyLListNode *pNode = pCurrHead;
+        SinglyLListNode *pNode = pList->pHead;
         isInOrder = true;
         while (pNode->pNext) {
             if ((ascend && 0 < pCompareFunc(pNode->pData, pNode->pNext->pData)) ||
@@ -157,6 +176,7 @@ bool SinglyLListReverse(SinglyLList *pList) {
     return true;
 }
 
+// Return -1 if no such item, return -2 if parameters invalid
 int SinglyLListFind(const SinglyLList *pList, const void *pVal, int (*pCompareFunc)(const void *, const void *)) {
     if (!pList || !pVal || !pCompareFunc) {
         return -2;
@@ -231,6 +251,7 @@ bool SinglyLListSetItem(SinglyLList *pList, int index, const void *pIn) {
     return true;
 }
 
+// Accept index range from 0 to pList->length
 bool SinglyLListInsertItem(SinglyLList *pList, int index, const void *pIn) {
     if (!pList || !pIn) {
         return false;
@@ -274,12 +295,61 @@ bool SinglyLListInsertItem(SinglyLList *pList, int index, const void *pIn) {
     return true;
 }
 
+// Accept index range from 0 to pList->length
+bool SinglyLListInsertLList(SinglyLList *pList, int index, const SinglyLList *pNewList) {
+	if (!pList || !pNewList) {
+		return false;
+	}
+
+	if (index < 0 || index > pList->length) {
+		return false;
+	}
+
+	if (pList->itemSize != pList->itemSize) {
+		return false;
+	}
+
+	SinglyLList *pTempList = SinglyLListCopy(pNewList);
+	if (!pTempList) {
+		return false;
+	}
+
+	if (pList->length == 0) {
+		pList->pHead = pTempList->pHead;
+		pList->pTail = pTempList->pTail;
+	} else {
+		if (index == 0) {
+			pTempList->pTail->pNext = pList->pHead;
+			pList->pHead = pTempList->pHead;
+		} else if (index == pList->length) {
+			pList->pTail->pNext = pTempList->pHead;
+			pList->pTail = pTempList->pTail;
+		} else {
+			pTempList->pTail->pNext = sllNodeAt(pList, index);
+			sllNodeAt(pList, index - 1)->pNext = pTempList->pHead;
+		}
+	}
+
+	pList->length += pNewList->length;
+	free(pTempList); // Not Destroy because should not free the nodes
+
+	return true;
+}
+
 bool SinglyLListAppendItem(SinglyLList *pList, const void *pIn) {
     return SinglyLListInsertItem(pList, pList->length, pIn);
 }
 
+bool SinglyLListAppendLList(SinglyLList *pList, const SinglyLList *pNewList) {
+	return SinglyLListInsertLList(pList, pList->length, pNewList);
+}
+
 bool SinglyLListPrependItem(SinglyLList *pList, const void *pIn) {
     return SinglyLListInsertItem(pList, 0, pIn);
+}
+
+bool SinglyLListPrependLList(SinglyLList *pList, const SinglyLList *pNewList) {
+	return SinglyLListInsertLList(pList, 0, pNewList);
 }
 
 bool SinglyLListMoveItem(SinglyLList *pList, int oldIndex, int newIndex) {
