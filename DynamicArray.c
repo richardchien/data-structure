@@ -146,6 +146,7 @@ void ArrayTraverse(Array *pArr, void (*pFunc)(void *)) {
     }
 }
 
+// Probably mess up the original order if memory is not enough
 bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), bool ascend) {
     if (!pArr || !pCompareFunc) {
         return false;
@@ -175,6 +176,7 @@ bool ArraySort(Array *pArr, int (*pCompareFunc)(const void *, const void *), boo
     return true;
 }
 
+// Probably mess up the original order if memory is not enough
 bool ArrayReverse(Array *pArr) {
     if (!pArr) {
         return false;
@@ -191,6 +193,7 @@ bool ArrayReverse(Array *pArr) {
     return true;
 }
 
+// Return -1 if no such item, return -2 if parameters invalid
 int ArrayFind(const Array *pArr, const void *pVal, int (*pCompareFunc)(const void *, const void *)) {
     if (!pArr || !pVal || !pCompareFunc) {
         return -2;
@@ -243,6 +246,7 @@ bool ArraySetItem(Array *pArr, int index, const void *pIn) {
     return true;
 }
 
+// Accept index range from 0 to pArr->length
 bool ArrayInsertItem(Array *pArr, int index, const void *pIn) {
     if (!pArr || !pIn) {
         return false;
@@ -264,6 +268,7 @@ bool ArrayInsertItem(Array *pArr, int index, const void *pIn) {
     return true;
 }
 
+// Accept index range from 0 to pArr->length, itemSize should be the same, probably mess up the original order if memory is not enough
 bool ArrayInsertArray(Array *pArr, int index, const Array *pNewArr) {
     if (!pArr || !pNewArr) {
         return false;
@@ -272,6 +277,10 @@ bool ArrayInsertArray(Array *pArr, int index, const Array *pNewArr) {
     if (index < 0 || index > pArr->length) {
         return false;
     }
+
+	if (pArr->itemSize != pNewArr->itemSize) {
+		return false;
+	}
     
     int originLen = pArr->length;
     
@@ -312,10 +321,15 @@ bool ArrayAppendItem(Array *pArr, const void *pIn) {
     return true;
 }
 
+// The itemSize of two array should be the same
 bool ArrayAppendArray(Array *pArr, const Array *pNewArr) {
     if (!pArr || !pNewArr) {
         return false;
     }
+
+	if (pArr->itemSize != pNewArr->itemSize) {
+		return false;
+	}
     
     void *pData = realloc(pArr->pData, (pArr->length + pNewArr->length) * pArr->itemSize);
     if (!pData) {
@@ -336,6 +350,7 @@ bool ArrayPrependItem(Array *pArr, const void *pIn) {
     return ArrayInsertItem(pArr, 0, pIn);
 }
 
+// The itemSize of two array should be the same
 bool ArrayPrependArray(Array *pArr, const Array *pNewArr) {
     return ArrayInsertArray(pArr, 0, pNewArr);
 }

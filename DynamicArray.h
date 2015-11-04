@@ -53,11 +53,13 @@ bool ArrayGetLastItem(const Array *pArr, void *pOut);
 bool ArraySetItem(Array *pArr, int index, const void *pIn);
 // Accept index range from 0 to pArr->length
 bool ArrayInsertItem(Array *pArr, int index, const void *pIn);
-// Probably mess up the original order if memory is not enough
+// Accept index range from 0 to pArr->length, itemSize should be the same, probably mess up the original order if memory is not enough
 bool ArrayInsertArray(Array *pArr, int index, const Array *pNewArr);
 bool ArrayAppendItem(Array *pArr, const void *pIn);
+// The itemSize of two array should be the same
 bool ArrayAppendArray(Array *pArr, const Array *pNewArr);
 bool ArrayPrependItem(Array *pArr, const void *pIn);
+// The itemSize of two array should be the same
 bool ArrayPrependArray(Array *pArr, const Array *pNewArr);
 bool ArrayMoveItem(Array *pArr, int oldIndex, int newIndex);
 bool ArraySwapItems(Array *pArr, int aIndex, int bIndex);
