@@ -85,13 +85,17 @@ bool StringReplaceCharacterAWithB(String *pStr, int aIndex, int bIndex);
 bool StringReplaceSubString(String *pStr, int index, const String *pNewSub);
 bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub);
 bool StringReplaceAllCharater(String *pStr, char oldCh, char newCh);
+// The length of pOldSub should be greater than 0
 bool StringReplaceAllSubString(String *pStr, const String *pOldSub, const String *pNewSub);
+// The length of pOldCSub should be greater than 0
 bool StringReplaceAllSubCString(String *pStr, const char *pOldCSub, const char *pNewCSub);
 
 #pragma mark ---Insert
 // Accept index range from 0 to pStr->length
 bool StringInsertCharacter(String *pStr, int index, char ch);
+// Accept index range from 0 to pStr->length
 bool StringInsertString(String *pStr, int index, const String *pNewStr);
+// Accept index range from 0 to pStr->length
 bool StringInsertCString(String *pStr, int index, const char *pNewCStr);
 
 #pragma mark ---Append & Prepend

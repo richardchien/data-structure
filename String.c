@@ -55,17 +55,17 @@ String *StringConcat(const String *pStrA, const String *pStrB) {
 }
 
 // Accept Array of String
-String *StringJoin(const Array *pStrArr, char separator);
+String *StringJoin(const Array *pStrArr, char separator); //TODO
 // Accept Array of C string
-String *StringJoinC(const Array *pCStrArr, char separator);
+String *StringJoinC(const Array *pCStrArr, char separator); //TODO
 // Accept Array of String
-char   *CStringJoin(const Array *pStrArr, char separator);
+char   *CStringJoin(const Array *pStrArr, char separator); //TODO
 // Return Array of String
-Array *StringSplit(const String *pStr, char separator);
+Array *StringSplit(const String *pStr, char separator); //TODO
 // Return Array of String
-Array *StringSplitC(const char *pCStr, char separator);
+Array *StringSplitC(const char *pCStr, char separator); //TODO
 // Return Array of C string
-Array *CStringSplit(const String *pStr, char separator);
+Array *CStringSplit(const String *pStr, char separator); //TODO
 
 char *StringCString(const String *pStr) {
     if (!pStr) {
@@ -251,24 +251,26 @@ int  StringFindSubCString(const String *pStr, const char *pCSub) {
     if (!pStr || !pCSub) {
         return -2;
     }
+
+	int cSubLength = (int)strlen(pCSub);
     
-    if (pStr->length < strlen(pCSub)) {
+    if (pStr->length < cSubLength) {
         return -1;
     }
     
     int index = -1;
     for (int i = 0; i < pStr->length; i++) {
-        if (pStr->length - i < strlen(pCSub)) {
+        if (pStr->length - i < cSubLength) {
             break;
         }
         
         if (StringCharacter(pStr, i) == *pCSub) {
-            for (int j = 0; j < strlen(pCSub); j++) {
+            for (int j = 0; j < cSubLength; j++) {
                 if (StringCharacter(pStr, i + j) != *(pCSub + j)) {
                     break;
                 }
                 
-                if (j == strlen(pCSub) - 1) {
+                if (j == cSubLength - 1) {
                     index = i;
                 }
             }
@@ -380,7 +382,8 @@ bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub) {
     }
     
     bool shouldDoAppend = false;
-    for (int i = index, j = 0; j < strlen(pNewCSub); i++, j++) {
+	int newCSubLength = (int)strlen(pNewCSub);
+    for (int i = index, j = 0; j < newCSubLength; i++, j++) {
         if (i >= pStr->length) {
             shouldDoAppend = true;
         }
@@ -399,16 +402,175 @@ bool StringReplaceSubCString(String *pStr, int index, const char *pNewCSub) {
     return true;
 }
 
-bool StringReplaceAllCharater(String *pStr, char oldCh, char newCh);
-bool StringReplaceAllSubString(String *pStr, const String *pOldSub, const String *pNewSub);
-bool StringReplaceAllSubCString(String *pStr, const char *pOldCSub, const char *pNewCSub);
+bool StringReplaceAllCharater(String *pStr, char oldCh, char newCh) {
+	if (!pStr) {
+		return false;
+	}
+
+	for (int i = 0; i < pStr->length; i++) {
+		if (StringCharacter(pStr, i) == oldCh) {
+			StringReplaceCharacter(pStr, i, newCh);
+		}
+	}
+
+	return true;
+}
+
+// The length of pOldSub should be greater than 0
+bool StringReplaceAllSubString(String *pStr, const String *pOldSub, const String *pNewSub) {
+	if (!pStr || !pOldSub || !pNewSub) {
+		return false;
+	}
+
+	if (pOldSub->length == 0) {
+		return false;
+	}
+
+	int index = -1;
+	for (int i = 0; i < pStr->length; i++) {
+		if (pStr->length - i < pOldSub->length) {
+			break;
+		}
+
+		if (StringCharacter(pStr, i) == StringFirstCharacter(pOldSub)) {
+			for (int j = 0; j < pOldSub->length; j++) {
+				if (StringCharacter(pStr, i + j) != StringCharacter(pOldSub, j)) {
+					break;
+				}
+
+				if (j == pOldSub->length - 1) {
+					index = i;
+				}
+			}
+		}
+
+		if (index >= 0) {
+			// Found, then replace substring from index to the end of pOldStr
+            int minLength = pOldSub->length < pNewSub->length ? pOldSub->length : pNewSub->length;
+			int j;
+			for (j = 0; j < minLength; j++) {
+				StringReplaceCharacter(pStr, index + j, StringCharacter(pNewSub, j));
+			}
+
+			if (pOldSub->length > pNewSub->length) {
+				for (; j < pOldSub->length; j++) {
+					StringDeleteCharacter(pStr, index + minLength);
+				}
+			} else {
+				for (; j < pNewSub->length; j++) {
+					if (!StringInsertCharacter(pStr, index + j, StringCharacter(pNewSub, j))) {
+						// Delete the characters inserted before
+						for (int k = index + minLength; k < index + j; k++) {
+							StringDeleteCharacter(pStr, k);
+						}
+						return false;
+					}
+				}
+			}
+
+			// Replaced a substring, continue to search
+			i = index + pNewSub->length;
+			index = -1;
+			continue;
+		}
+	}
+
+	return true;
+}
+
+// The length of pOldCSub should be greater than 0
+bool StringReplaceAllSubCString(String *pStr, const char *pOldCSub, const char *pNewCSub) {
+	if (!pStr || !pOldCSub || !pNewCSub) {
+		return false;
+	}
+
+	int oldCSubLength = (int)strlen(pOldCSub);
+	int newCSubLength = (int)strlen(pNewCSub);
+
+	if (oldCSubLength == 0) {
+		return false;
+	}
+
+	int index = -1;
+	for (int i = 0; i < pStr->length; i++) {
+		if (pStr->length - i < oldCSubLength) {
+			break;
+		}
+
+		if (StringCharacter(pStr, i) == *pOldCSub) {
+			for (int j = 0; j < oldCSubLength; j++) {
+				if (StringCharacter(pStr, i + j) != *(pOldCSub + j)) {
+					break;
+				}
+
+				if (j == oldCSubLength - 1) {
+					index = i;
+				}
+			}
+		}
+
+		if (index >= 0) {
+			// Found, then replace substring from index to the end of pOldStr
+            int minLength = oldCSubLength < newCSubLength ? oldCSubLength : newCSubLength;
+			int j;
+			for (j = 0; j < minLength; j++) {
+				StringReplaceCharacter(pStr, index + j, *(pNewCSub + j));
+			}
+
+			if (oldCSubLength > newCSubLength) {
+				for (; j < oldCSubLength; j++) {
+					StringDeleteCharacter(pStr, index + minLength);
+				}
+			}
+			else {
+				for (; j < newCSubLength; j++) {
+					if (!StringInsertCharacter(pStr, index + j, *(pNewCSub + j))) {
+						// Delete the characters inserted before
+						for (int k = index + minLength; k < index + j; k++) {
+							StringDeleteCharacter(pStr, k);
+						}
+						return false;
+					}
+				}
+			}
+
+			i = index + newCSubLength;
+			index = -1;
+			continue;
+		}
+	}
+
+	return true;
+}
 
 #pragma mark ---Insert
 
 // Accept index range from 0 to pStr->length
-bool StringInsertCharacter(String *pStr, int index, char ch);
-bool StringInsertString(String *pStr, int index, const String *pNewStr);
-bool StringInsertCString(String *pStr, int index, const char *pNewCStr);
+bool StringInsertCharacter(String *pStr, int index, char ch) {
+	return ArrayInsertItem(pStr, index, &ch);
+}
+
+bool StringInsertString(String *pStr, int index, const String *pNewStr) {
+	return ArrayInsertArray(pStr, index, pNewStr);
+}
+
+bool StringInsertCString(String *pStr, int index, const char *pNewCStr) {
+	if (!pStr || !pNewCStr) {
+		return false;
+	}
+
+	for (int i = 0; *(pNewCStr + i) != '\0'; i++) {
+		if (!StringInsertCharacter(pStr, index + i, *(pNewCStr + i))) {
+			// Delete the characters appended before
+			for (int j = 0; j < i; j++) {
+				StringDeleteCharacter(pStr, index);
+			}
+			return false;
+		}
+	}
+
+	return true;
+}
 
 #pragma mark ---Append & Prepend
 
@@ -421,21 +583,7 @@ bool StringAppendString(String *pStr, const String *pNewStr) {
 }
 
 bool StringAppendCString(String *pStr, const char *pNewCStr) {
-    if (!pStr || !pNewCStr) {
-        return false;
-    }
-    
-    for (int i = 0; *(pNewCStr + i) != '\0'; i++) {
-        if (!StringAppendCharacter(pStr, *(pNewCStr + i))) {
-            // Delete the characters appended before
-            for (int j = 0; j < i; j++) {
-                StringDeleteLastCharacter(pStr);
-            }
-            return false;
-        }
-    }
-    
-    return true;
+	return StringInsertCString(pStr, pStr->length, pNewCStr);
 }
 
 bool StringPrependCharacter(String *pStr, char ch) {
@@ -447,25 +595,33 @@ bool StringPrependString(String *pStr, const String *pNewStr) {
 }
 
 bool StringPrependCString(String *pStr, const char *pNewCStr) {
-    return true;
+	return StringInsertCString(pStr, 0, pNewCStr);
 }
 
 #pragma mark ---Move & Swap
 
-bool StringMoveCharacter(String *pStr, int oldIndex, int newIndex);
-bool StringSwapCharacters(String *pStr, int aIndex, int bIndex);
+bool StringMoveCharacter(String *pStr, int oldIndex, int newIndex) {
+	return ArrayMoveItem(pStr, oldIndex, newIndex);
+}
+
+bool StringSwapCharacters(String *pStr, int aIndex, int bIndex) {
+	return ArraySwapItems(pStr, aIndex, bIndex);
+}
 
 #pragma mark ---Delete
 
 bool StringDeleteCharacter(String *pStr, int index) {
     return ArrayDeleteItem(pStr, index);
 }
+
 bool StringDeleteFirstCharacter(String *pStr) {
     return ArrayDeleteFirstItem(pStr);
 }
+
 bool StringDeleteLastCharacter(String *pStr) {
     return ArrayDeleteLastItem(pStr);
 }
+
 bool StringDeleteSubString(String *pStr, int start, int length) {
     if (!pStr) {
         return false;
