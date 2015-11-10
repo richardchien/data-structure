@@ -14,19 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma mark - Singly Linked List Structure
+#pragma mark - Type Definition
 
-typedef struct singly_llist_node {
-    void *pData;
-    struct singly_llist_node *pNext;
-} SinglyLListNode;
-
-typedef struct {
-    SinglyLListNode *pHead;
-    SinglyLListNode *pTail;
-    int itemSize;
-    int length;
-} SinglyLList;
+typedef struct _singly_llist SinglyLList;
 
 #pragma mark - Singly Linked List Make List
 

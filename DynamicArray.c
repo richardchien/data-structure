@@ -8,6 +8,14 @@
 
 #include "DynamicArray.h"
 
+#pragma mark - Dynamic Array Structure
+
+struct _dynamic_array {
+    void *pData;
+    int length;
+    int itemSize;
+};
+
 #pragma mark - Inner Function
 
 static void *itemAt(const Array *pArr, int index) {

@@ -14,11 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
-    void *pData;
-    int length;
-    int itemSize;
-} Array;
+#pragma mark - Type Definition
+
+typedef struct _dynamic_array Array;
 
 #pragma mark - Make Array
 

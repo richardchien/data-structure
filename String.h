@@ -10,8 +10,9 @@
 #define __String__
 
 #include <stdio.h>
-
 #include "DynamicArray.h"
+
+#pragma mark - Type Definition
 
 typedef Array String;
 

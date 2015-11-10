@@ -8,6 +8,20 @@
 
 #include "LinkedList.h"
 
+#pragma mark - Singly Linked List Structure
+
+typedef struct _singly_llist_node {
+    void *pData;
+    struct _singly_llist_node *pNext;
+} SinglyLListNode;
+
+struct _singly_llist {
+    SinglyLListNode *pHead;
+    SinglyLListNode *pTail;
+    int itemSize;
+    int length;
+};
+
 #pragma mark - Inner Function
 
 static SinglyLListNode *sllNodeAt(const SinglyLList *pList, int index) {
