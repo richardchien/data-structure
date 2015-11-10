@@ -139,9 +139,9 @@ bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const
     }
     
     // Bubble sort
-    SinglyLListNode *pCurrHead = pList->pHead;
     bool isInOrder = false;
-    while (pCurrHead->pNext && !isInOrder) {
+    /*SinglyLListNode *pCurr = pList->pHead;
+    while (pCurr->pNext && !isInOrder) {
         //SinglyLListNode *pNode = pCurrHead;
         SinglyLListNode *pNode = pList->pHead;
         isInOrder = true;
@@ -155,7 +155,21 @@ bool SinglyLListSort(SinglyLList *pList, int (*pCompareFunc)(const void *, const
             }
             pNode = pNode->pNext;
         }
-        pCurrHead = pCurrHead->pNext;
+        pCurr = pCurr->pNext;
+    }*/
+    for (int i = 0; i < pList->length - 1; i++) {
+        SinglyLListNode *pNode = pList->pHead;
+        isInOrder = true;
+        for (int j = 0; j < pList->length - 1 - i; j++) {
+            if ((ascend && 0 < pCompareFunc(pNode->pData, pNode->pNext->pData)) ||
+                (!ascend && 0 > pCompareFunc(pNode->pData, pNode->pNext->pData))) {
+                void *pT = pNode->pData;
+                pNode->pData = pNode->pNext->pData;
+                pNode->pNext->pData = pT;
+                isInOrder = false;
+            }
+            pNode = pNode->pNext;
+        }
     }
     
     return true;
