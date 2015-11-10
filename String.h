@@ -22,11 +22,11 @@ String *StringInitWithCString(const char *pCStr);
 String *StringSubString(const String *pStr, int start, int length);
 String *StringCopy(const String *pStr);
 String *StringConcat(const String *pStrA, const String *pStrB);
-// Accept Array of String
+// Accept Array of String, join as much as it can(in case of memory insufficient)
 String *StringJoin(const Array *pStrArr, char separator);
-// Accept Array of C string
+// Accept Array of C string, join as much as it can(in case of memory insufficient)
 String *StringJoinC(const Array *pCStrArr, char separator);
-// Accept Array of String
+// Accept Array of String, join as much as it can(in case of memory insufficient), you should free the C string by yourself
 char   *CStringJoin(const Array *pStrArr, char separator);
 // Return Array of String
 Array  *StringSplit(const String *pStr, char separator);

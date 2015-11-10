@@ -54,14 +54,120 @@ String *StringConcat(const String *pStrA, const String *pStrB) {
     return ArrayConcat(pStrA, pStrB);
 }
 
-// Accept Array of String
-String *StringJoin(const Array *pStrArr, char separator); //TODO
-// Accept Array of C string
-String *StringJoinC(const Array *pCStrArr, char separator); //TODO
-// Accept Array of String
-char   *CStringJoin(const Array *pStrArr, char separator); //TODO
+// Accept Array of String, join as much as it can(in case of memory insufficient)
+String *StringJoin(const Array *pStrArr, char separator) {
+    if (!pStrArr) {
+        return NULL;
+    }
+    
+    if (pStrArr->length == 0) {
+        return StringInit();
+    }
+    
+    String *pTemp = NULL;
+    ArrayGetFirstItem(pStrArr, &pTemp);
+    String *pOut = StringCopy(pTemp);
+    if (!pOut) {
+        return NULL;
+    }
+    
+    if (pStrArr->length > 1) {
+        for (int i = 1; i < pStrArr->length; i++) {
+            ArrayGetItem(pStrArr, i, &pTemp);
+            if (!StringAppendCharacter(pOut, separator) || !StringAppendString(pOut, pTemp)) {
+                return pOut;
+            }
+        }
+    }
+    
+    return pOut;
+}
+
+// Accept Array of C string, join as much as it can(in case of memory insufficient)
+String *StringJoinC(const Array *pCStrArr, char separator) {
+    if (!pCStrArr) {
+        return NULL;
+    }
+    
+    if (pCStrArr->length == 0) {
+        return StringInit();
+    }
+    
+    char *pCTemp = NULL;
+    ArrayGetFirstItem(pCStrArr, &pCTemp);
+    String *pOut = StringInitWithCString(pCTemp);
+    if (!pOut) {
+        return NULL;
+    }
+    
+    if (pCStrArr->length > 1) {
+        for (int i = 1; i < pCStrArr->length; i++) {
+            ArrayGetItem(pCStrArr, i, &pCTemp);
+            if (!StringAppendCharacter(pOut, separator) || !StringAppendCString(pOut, pCTemp)) {
+                return pOut;
+            }
+        }
+    }
+    
+    return pOut;
+}
+
+// Accept Array of String, join as much as it can(in case of memory insufficient), you should free the C string by yourself
+char *CStringJoin(const Array *pStrArr, char separator) {
+    if (!pStrArr) {
+        return NULL;
+    }
+    
+    char *pCOut = malloc(1);
+    
+    if (!pCOut) {
+        return NULL;
+    }
+    
+    if (pStrArr->length == 0) {
+        *pCOut = '\0';
+        return pCOut;
+    }
+    
+    String *pCurr = NULL;
+    ArrayGetFirstItem(pStrArr, &pCurr);
+    if (!realloc(pCOut, pCurr->length + 1)) {
+        return pCOut;
+    }
+    memcpy(pCOut, pCurr->pData, pCurr->length);
+    *(pCOut + pCurr->length) = '\0';
+    
+    for (int i = 1; i < pStrArr->length; i++) {
+        ArrayGetItem(pStrArr, i, &pCurr);
+        if (!realloc(pCOut, strlen(pCOut) + 1/*sep*/ + pCurr->length + 1)) {
+            return pCOut;
+        }
+        int length = (int)strlen(pCOut);
+        *(pCOut + length) = separator;
+        memcpy(pCOut + length + 1, pCurr->pData, pCurr->length);
+        *(pCOut + length + 1 + pCurr->length) = '\0';
+    }
+    
+    return pCOut;
+}
+
 // Return Array of String
-Array *StringSplit(const String *pStr, char separator); //TODO
+Array *StringSplit(const String *pStr, char separator) {
+    if (!pStr) {
+        return NULL;
+    }
+    
+    Array *pOut = ArrayInit(sizeof(String *));
+    
+    int index = -1;
+    bool couldSplit = false;
+    for (int i = 0; i < pStr->length; i++) {
+        //TODO
+    }
+    
+    return pOut;
+}
+
 // Return Array of String
 Array *StringSplitC(const char *pCStr, char separator); //TODO
 // Return Array of C string
